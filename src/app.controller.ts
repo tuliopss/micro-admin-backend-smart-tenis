@@ -1,6 +1,6 @@
 import { Controller, Get, Logger, Post } from '@nestjs/common';
 import { AppService } from './app.service';
-import { EventPattern, Payload } from '@nestjs/microservices';
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { Category } from './interfaces/categories/categories.interface';
 
 @Controller()
@@ -12,5 +12,10 @@ export class AppController {
   async createCategory(@Payload() category: Category) {
     this.logger.log('category: ', JSON.stringify(category));
     await this.appService.createCategory(category);
+  }
+
+  @MessagePattern('get-categories')
+  async getCategories(): Promise<Category[]> {
+    return await this.appService.getCategories();
   }
 }
