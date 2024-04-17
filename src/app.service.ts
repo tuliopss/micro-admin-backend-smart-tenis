@@ -35,14 +35,13 @@ export class AppService {
 
   async getCategoriesById(id: string): Promise<Category> {
     try {
-      console.log(id);
+      // console.log(id);
       const category = await this.categoryModel.findById(id);
       console.log('id', id);
       console.log('cat', category);
       if (!category) {
         throw new NotFoundException('Category not found');
       }
-
       return category;
     } catch (error) {
       this.logger.error(`${JSON.stringify(error.message)}`);

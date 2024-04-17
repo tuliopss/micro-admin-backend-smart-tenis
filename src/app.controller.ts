@@ -20,7 +20,7 @@ export class AppController {
   }
 
   @MessagePattern('get-categories-by-id')
-  async getCategoriesById(@Param('id') id: string): Promise<Category> {
+  async getCategoriesById(@Payload() id: string): Promise<Category> {
     console.log('contr', id);
     return await this.appService.getCategoriesById(id);
   }
