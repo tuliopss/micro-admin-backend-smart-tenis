@@ -9,6 +9,7 @@ async function bootstrap() {
     transport: Transport.RMQ,
     options: {
       urls: ['amqp://guest:guest@localhost:5672'],
+      noAck: false,
       queue: 'admin-backend',
     },
   });
