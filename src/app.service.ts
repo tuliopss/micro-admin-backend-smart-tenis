@@ -37,14 +37,30 @@ export class AppService {
     try {
       // console.log(id);
       const category = await this.categoryModel.findById(id);
-      console.log('id', id);
-      console.log('cat', category);
       if (!category) {
         throw new NotFoundException('Category not found');
       }
       return category;
     } catch (error) {
       this.logger.error(`${JSON.stringify(error.message)}`);
+      throw new RpcException(error.message);
+    }
+  }
+
+  async updateCategory(id: string, category: Category): Promise<Category> {
+    const categoryFound = await this.categoryModel.findById(id);
+
+    if (!categoryFound) {
+      throw new NotFoundException('Category not found');
+    }
+
+    try {
+      return await this.categoryModel.findOneAndUpdate(
+        { _id: id },
+        { $set: category },
+      );
+    } catch (error) {
+      this.logger.error(`Error: ${JSON.stringify(error.message)}`);
       throw new RpcException(error.message);
     }
   }
