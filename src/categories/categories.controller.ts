@@ -1,5 +1,6 @@
+import { CategoriesService } from './categories.service';
 import { Controller, Get, Logger, Param, Post } from '@nestjs/common';
-import { AppService } from './app.service';
+// import { AppService } from '../app.service';
 import {
   Ctx,
   EventPattern,
@@ -7,14 +8,14 @@ import {
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
-import { Category } from './interfaces/categories/categories.interface';
+import { Category } from '../interfaces/categories/categories.interface';
 
 const ackErrors: string[] = ['E11000'];
 
 @Controller()
-export class AppController {
-  constructor(private readonly appService: AppService) {}
-  private logger = new Logger(AppService.name);
+export class CategoryController {
+  constructor(private readonly categoriesService: CategoriesService) {}
+  private logger = new Logger(CategoryController.name);
 
   @EventPattern('create-category')
   async createCategory(
@@ -27,7 +28,7 @@ export class AppController {
     this.logger.log('category: ', JSON.stringify(category));
 
     try {
-      await this.appService.createCategory(category);
+      await this.categoriesService.createCategory(category);
 
       await channel.ack(originalMsg);
     } catch (error) {
@@ -47,7 +48,7 @@ export class AppController {
     const originalMsg = context.getMessage();
 
     try {
-      return await this.appService.getCategories();
+      return await this.categoriesService.getCategories();
     } finally {
       await channel.ack(originalMsg);
     }
@@ -62,7 +63,7 @@ export class AppController {
     const originalMsg = context.getMessage();
 
     try {
-      return await this.appService.getCategoriesById(id);
+      return await this.categoriesService.getCategoriesById(id);
     } finally {
       await channel.ack(originalMsg);
     }
@@ -78,7 +79,7 @@ export class AppController {
     const category: Category = data.category;
 
     try {
-      await this.appService.updateCategory(id, category);
+      await this.categoriesService.updateCategory(id, category);
       await channel.ack(originalMsg);
     } catch (error) {
       ackErrors.map(async (ackError) => {
