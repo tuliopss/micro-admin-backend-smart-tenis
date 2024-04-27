@@ -12,12 +12,12 @@ export const CategorySchema = new mongoose.Schema(
       },
     ],
 
-    players: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Player',
-      },
-    ],
+    // players: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Player',
+    //   },
+    // ],
   },
   { timestamps: true, collection: 'categories' },
 );

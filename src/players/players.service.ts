@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
 import { Player } from './interfaces/Player.interface';
@@ -14,7 +19,6 @@ export class PlayersService {
 
   async createPlayer(player: Player): Promise<Player> {
     const playerCreated = new this.playerModel(player);
-
     try {
       return await playerCreated.save();
     } catch (error) {
@@ -25,7 +29,11 @@ export class PlayersService {
 
   async getPlayers(): Promise<Player[]> {
     try {
-      return await this.playerModel.find();
+      const players = await this.playerModel
+        .find()
+        .populate([{ path: 'category', model: 'Category' }]);
+      console.log(players);
+      return players;
     } catch (error) {
       this.logger.error(`${JSON.stringify(error.message)}`);
       throw new RpcException(error.message);
@@ -34,12 +42,13 @@ export class PlayersService {
 
   async getPlayerById(id: string): Promise<Player> {
     if (!isValidObjectId(id)) {
-      throw new NotFoundException(`Invalid ID`);
+      throw new BadRequestException(`Invalid IDd`);
     }
     try {
       const player = await this.playerModel
         .findById(id)
-        .populate([{ path: 'categories', model: 'category' }]);
+        .populate([{ path: 'category', model: 'Category' }]);
+
       if (!player) {
         throw new NotFoundException(`Player not Found`);
       }
@@ -52,17 +61,13 @@ export class PlayersService {
   }
 
   async updatePlayer(id: string, player: Player): Promise<Player> {
-    if (!isValidObjectId(id)) {
-      throw new NotFoundException(`Invalid ID`);
-    }
     try {
-      const playerFound = await this.playerModel.findById(id);
+      const playerFound = await this.playerModel.findOne({ _id: id });
 
       if (!playerFound) {
-        throw new NotFoundException(`Player not Found`);
+        throw new BadRequestException('Player not found');
       }
-
-      return await this.playerModel.findOneAndUpdate(
+      return await this.playerModel.findByIdAndUpdate(
         { _id: id },
         { $set: player },
       );
@@ -73,16 +78,8 @@ export class PlayersService {
   }
 
   async deletePlayer(id: string): Promise<void> {
-    if (!isValidObjectId(id)) {
-      throw new NotFoundException(`Invalid ID`);
-    }
     try {
-      const playerFound = await this.playerModel.findById(id);
-
-      if (!playerFound) {
-        throw new NotFoundException(`Player not Found`);
-      }
-
+      console.log('to aq no delete');
       await this.playerModel.findByIdAndDelete(id);
     } catch (error) {
       this.logger.error(`Error ${JSON.stringify(error.message)}`);

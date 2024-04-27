@@ -1,4 +1,4 @@
-import { Controller, Logger } from '@nestjs/common';
+import { BadRequestException, Controller, Logger } from '@nestjs/common';
 import { PlayersService } from './players.service';
 import {
   Ctx,
@@ -8,6 +8,7 @@ import {
   RmqContext,
 } from '@nestjs/microservices';
 import { Player } from './interfaces/Player.interface';
+import { isValidObjectId } from 'mongoose';
 
 const ackErrors: string[] = ['E11000'];
 
@@ -47,10 +48,7 @@ export class PlayersController {
   }
 
   @MessagePattern('get-players-by-id')
-  async getCategoriesById(
-    @Payload() id: string,
-    @Ctx() context: RmqContext,
-  ): Promise<Player> {
+  async getPlayersById(@Payload() id: string, @Ctx() context: RmqContext) {
     const channel = context.getChannelRef();
     const originalMsg = context.getMessage();
 
@@ -58,6 +56,44 @@ export class PlayersController {
       return await this.playerService.getPlayerById(id);
     } finally {
       await channel.ack(originalMsg);
+    }
+  }
+
+  @EventPattern('update-player')
+  async updatePlayer(@Payload() data: any, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+    try {
+      console.log(data);
+      const id = data.id;
+      const player = data.updatePlayerDTO;
+      await this.playerService.updatePlayer(id, player);
+
+      await channel.ack(originalMsg);
+    } catch (error) {
+      // this.logger.error(`error: ${JSON.stringify(error.message)}`);
+      ackErrors.map(async (ackError) => {
+        if (error.message.includes(ackError)) {
+          await channel.ack(originalMsg);
+        }
+      });
+    }
+  }
+
+  @EventPattern('delete-player')
+  async deletePlayer(@Payload() id: string, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+
+    try {
+      await this.playerService.deletePlayer(id);
+      await channel.ack(originalMsg);
+    } catch (error) {
+      ackErrors.map(async (ackError) => {
+        if (error.message.includes(ackError)) {
+          await channel.ack(originalMsg);
+        }
+      });
     }
   }
 }
