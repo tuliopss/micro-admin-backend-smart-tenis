@@ -1,5 +1,5 @@
+import { Category } from 'src/categories/interfaces/categories.interface';
 import { Document } from 'mongoose';
-import { Category } from 'src/interfaces/categories/categories.interface';
 
 export interface Player extends Document {
   readonly phone: string;
@@ -7,6 +7,6 @@ export interface Player extends Document {
   category: Category;
   name: string;
   ranking: string;
-  posicaoRanking: number;
-  urlPhoto: string;
+  positionRanking: number;
+  urlPlayerPhoto: string;
 }

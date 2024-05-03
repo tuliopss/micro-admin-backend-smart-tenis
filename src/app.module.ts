@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CategoriesModule } from './categories/categories.module';
-import { CategorySchema } from './interfaces/categories/categorySchema.schema';
+import { CategorySchema } from './categories/interfaces/categorySchema.schema';
 import { PlayerSchema } from './players/interfaces/player.schema';
 import { PlayersModule } from './players/players.module';
 

@@ -1,9 +1,8 @@
+import { Category } from 'src/categories/interfaces/categories.interface';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { RpcException } from '@nestjs/microservices';
-import { Category } from 'src/interfaces/categories/categories.interface';
-import { Player } from 'src/interfaces/players/interfaces/Player.interface';
 
 @Injectable()
 export class CategoriesService {

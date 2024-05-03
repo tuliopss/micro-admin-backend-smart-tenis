@@ -20,6 +20,7 @@ export class PlayersService {
   async createPlayer(player: Player): Promise<Player> {
     const playerCreated = new this.playerModel(player);
     try {
+      console.log('SERVICE', playerCreated);
       return await playerCreated.save();
     } catch (error) {
       this.logger.error(`Error ${JSON.stringify(error.message)}`);
@@ -29,9 +30,8 @@ export class PlayersService {
 
   async getPlayers(): Promise<Player[]> {
     try {
-      const players = await this.playerModel
-        .find()
-        .populate([{ path: 'category', model: 'Category' }]);
+      const players = await this.playerModel.find();
+
       console.log(players);
       return players;
     } catch (error) {
@@ -45,9 +45,7 @@ export class PlayersService {
       throw new BadRequestException(`Invalid IDd`);
     }
     try {
-      const player = await this.playerModel
-        .findById(id)
-        .populate([{ path: 'category', model: 'Category' }]);
+      const player = await this.playerModel.findById(id);
 
       if (!player) {
         throw new NotFoundException(`Player not Found`);
@@ -67,7 +65,7 @@ export class PlayersService {
       if (!playerFound) {
         throw new BadRequestException('Player not found');
       }
-      return await this.playerModel.findByIdAndUpdate(
+      return await this.playerModel.findOneAndUpdate(
         { _id: id },
         { $set: player },
       );

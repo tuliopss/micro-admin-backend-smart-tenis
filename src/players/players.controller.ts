@@ -64,14 +64,14 @@ export class PlayersController {
     const channel = context.getChannelRef();
     const originalMsg = context.getMessage();
     try {
-      console.log(data);
+      // console.log(data);
       const id = data.id;
       const player = data.updatePlayerDTO;
       await this.playerService.updatePlayer(id, player);
 
       await channel.ack(originalMsg);
     } catch (error) {
-      // this.logger.error(`error: ${JSON.stringify(error.message)}`);
+      this.logger.error(`error: ${JSON.stringify(error.message)}`);
       ackErrors.map(async (ackError) => {
         if (error.message.includes(ackError)) {
           await channel.ack(originalMsg);
